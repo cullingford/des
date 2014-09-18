@@ -1,16 +1,19 @@
 /* Write a program that will output a repetitive rectangle signal as below with 1ms high and 19ms low. */
 
 .global output
-#include <wiringPi.h>
+#include <wiringPi.h> /* Is this necessary? */
 
-output:
-	MOV R8, LR
+output:	MOV R8, LR
 	BL wiringPiSetup
 	
 	MOV R0, #14
 	MOV R1, #OUTPUT
 	BL pinMode
-	time:	.WORD 10
+	
+	LDR R0, [time]	/* Error!? */
+	MOV R1, #0
+	STR R1, [R0]
+	
 	loop: 	MOV R0, #14
 		MOV R1, #HIGH
 		BL digitalWrite
@@ -21,18 +24,21 @@ output:
 		BL digitalWrite
 		delay 19
 		
-		LDR R3, time
-		LDR R4, [R3]
-		ADD R4, R4, #20
-		STR R4, [R3]
+		LDR R2, [time]	/* Error!? */
+		LDR R3, time	/* Warning!? */
+		ADD R3, R3, #20
+		STR R3, [R2]
 		
-		CMP R4, #1000
+		CMP R3, #1000
 		BNE loop
 	BX R8
 
+.data
+.align 4
+time:	.WORD 16
+
 .global input
-input:
-	PUSH LR
+input:	PUSH LR
 	BL wiringPiSetup
 	
 	MOV R0, #12
@@ -45,8 +51,7 @@ input:
 	BX LR
 
 .global io
-io:
-	PUSH LR
+io:	PUSH LR
 	BL wiringPiSetup
 	
 	MOV R0, #12

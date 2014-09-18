@@ -10,7 +10,7 @@ output:
 	MOV R0, #14
 	MOV R1, #OUTPUT
 	BL pinMode
-	int TIME=0
+	time:	.WORD 10
 	loop: 	MOV R0, #14
 		MOV R1, #HIGH
 		BL digitalWrite
@@ -20,8 +20,14 @@ output:
 		MOV R1, #LOW
 		BL digitalWrite
 		delay 19
-		ADD TIME, TIME, #20
-		BL{TIME<1000} loop
+		
+		LDR R3, time
+		LDR R4, [R3]
+		ADD R4, R4, #20
+		STR R4, [R3]
+		
+		CMP R4, #1000
+		BNE loop
 	BX R8
 
 .global input
